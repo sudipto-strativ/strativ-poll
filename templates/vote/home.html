@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Strativ Poll{% endblock %}
+
+{% block content %}
+
+{% if unauthenticated %}
+  <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:96px 0; text-align:center;">
+    <svg width="48" height="48" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:24px;" aria-hidden="true">
+      <rect width="28" height="28" rx="6" fill="#FE5001"/>
+      <text x="14" y="20" text-anchor="middle" fill="white"
+            font-family="'Expletus Sans', Georgia, serif"
+            font-size="15" font-weight="700">S</text>
+    </svg>
+    <h1 style="font-size:2.25rem; font-weight:500; color:var(--warm-black); margin:0 0 12px; letter-spacing:-0.015em;">Strativ Poll</h1>
+    <p style="font-size:16px; color:var(--text-tertiary); max-width:360px; margin:0 0 32px; line-height:1.6;">Vote on entries in internal Strativ competitions. Sign in with your @strativ.se Google account to participate.</p>
+    <a href="{% url 'google_login' %}" class="btn btn-primary btn-lg">Sign in with Google</a>
+  </div>
+
+{% else %}
+
+  {% if open_events %}
+    <section style="margin-bottom:40px;">
+      <div class="section-label">
+        <span class="sn">01</span>
+        <span class="sd">—</span>
+        <h2>Open for voting</h2>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {% for event in open_events %}
+          <a href="{% url 'event_detail' event.id %}" class="card card-link block p-5">
+            <span class="badge badge-open">Open</span>
+            <h3 style="font-size:1.05rem; font-weight:500; color:var(--text-primary); margin:10px 0 0;">{{ event.title }}</h3>
+            {% if event.description %}
+              <p style="font-size:13px; color:var(--text-tertiary); margin:6px 0 0; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ event.description }}</p>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if closed_events %}
+    <section style="margin-bottom:40px;">
+      <div class="section-label">
+        <span class="sn">02</span>
+        <span class="sd">—</span>
+        <h2>Results</h2>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {% for event in closed_events %}
+          <a href="{% url 'event_detail' event.id %}" class="card card-link block p-5">
+            <span class="badge badge-closed">Closed</span>
+            <h3 style="font-size:1.05rem; font-weight:500; color:var(--text-primary); margin:10px 0 0;">{{ event.title }}</h3>
+            {% if event.description %}
+              <p style="font-size:13px; color:var(--text-tertiary); margin:6px 0 0; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ event.description }}</p>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if draft_events %}
+    <section style="margin-bottom:40px;">
+      <div class="section-label">
+        <span class="sn">03</span>
+        <span class="sd">—</span>
+        <h2 style="color:var(--text-tertiary);">Drafts <span style="font-size:13px; font-weight:400; font-family:'Inter',sans-serif;">(staff only)</span></h2>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {% for event in draft_events %}
+          <a href="{% url 'manage_event_detail' event.id %}" class="card card-link block p-5" style="border-style:dashed;">
+            <span class="badge badge-draft">Draft</span>
+            <h3 style="font-size:1.05rem; font-weight:500; color:var(--text-primary); margin:10px 0 0;">{{ event.title }}</h3>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if not open_events and not closed_events and not draft_events %}
+    <div style="text-align:center; padding:96px 0;">
+      <p style="font-size:18px; color:var(--text-tertiary);">No events yet.</p>
+    </div>
+  {% endif %}
+
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} — Strativ Poll{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:28px;">
+  <a href="/" class="back-link">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    All events
+  </a>
+  <h1 style="font-size:2rem; font-weight:500; color:var(--warm-black); margin:12px 0 8px; letter-spacing:-0.012em;">{{ event.title }}</h1>
+  {% if event.description %}
+    <p style="font-size:15px; color:var(--text-secondary); margin:0 0 6px; line-height:1.6;">{{ event.description }}</p>
+  {% endif %}
+  <p style="font-size:13px; color:var(--text-tertiary);">Select entries to vote. You can vote for multiple.</p>
+</div>
+
+{% if entries %}
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {% for entry in entries %}
+      {% include "vote/_entry_card.html" %}
+    {% endfor %}
+  </div>
+{% else %}
+  <p style="color:var(--text-tertiary); font-size:15px;">No entries yet.</p>
+{% endif %}
+{% endblock %}

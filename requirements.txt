@@ -1,0 +1,10 @@
+Django==6.0.6
+django-allauth==65.18.0
+django-environ==0.13.0
+easy-thumbnails==2.10.1
+Pillow==12.2.0
+PyJWT==2.13.0
+cryptography==48.0.0
+requests==2.34.2
+whitenoise==6.9.0
+gunicorn==23.0.0

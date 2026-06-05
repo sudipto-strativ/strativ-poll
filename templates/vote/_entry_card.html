@@ -1,0 +1,19 @@
+{% load thumbnail %}
+<div class="card" style="overflow:hidden; display:flex; flex-direction:column;">
+  {% with hero=entry.hero %}
+    {% if hero %}
+      <div style="aspect-ratio:1/1; overflow:hidden; background:var(--bg-subtle); cursor:zoom-in;"
+           data-lightbox="{% thumbnail hero.image 'detail' %}"
+           data-alt="{{ entry.title }}"
+           onclick="openLightbox(this.dataset.lightbox, this.dataset.alt)">
+        <img src="{% thumbnail hero.image 'card' %}" alt="{{ entry.title }}"
+             style="width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;">
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div style="padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex:1;">
+    <h3 style="font-size:14px; font-weight:500; color:var(--text-primary); line-height:1.4; margin:0; font-family:'Inter',sans-serif;">{{ entry.title }}</h3>
+    {% include "vote/_vote_button.html" with has_voted=entry.has_voted %}
+  </div>
+</div>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Strativ Poll{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Expletus+Sans:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    :root {
+      --accent:         #FE5001;
+      --accent-hover:   #E54600;
+      --accent-pressed: #C23A00;
+      --accent-subtle:  rgba(254,80,1,0.08);
+      --warm-black:     #1A0E1C;
+      --bg-canvas:      #F9FAFB;
+      --bg-surface:     #FFFFFF;
+      --bg-subtle:      #F2F4F7;
+      --border-subtle:  #E4E7EC;
+      --border-default: #D0D5DD;
+      --border-strong:  #98A2B3;
+      --text-primary:   #1A0E1C;
+      --text-secondary: rgba(26,14,28,0.78);
+      --text-tertiary:  rgba(26,14,28,0.56);
+      --text-disabled:  rgba(26,14,28,0.32);
+      --error:          #D92D20;
+      --success:        #039855;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Expletus Sans', Georgia, serif;
+    }
+
+    *:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(254,80,1,0.20);
+    }
+
+    /* ── Buttons ─────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      line-height: 1;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+    }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+    .btn-lg { padding: 12px 24px; font-size: 15px; }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:active { background: var(--accent-pressed); }
+
+    .btn-secondary { background: var(--bg-surface); color: var(--text-primary); border-color: var(--border-default); }
+    .btn-secondary:hover { border-color: var(--border-strong); }
+
+    .btn-dark { background: var(--warm-black); color: #fff; border-color: transparent; }
+    .btn-dark:hover { background: #2e1a32; }
+
+    .btn-destructive { background: transparent; color: var(--error); border-color: #FDA29B; }
+    .btn-destructive:hover { background: rgba(217,45,32,0.06); border-color: var(--error); }
+
+    /* ── Cards ───────────────────────────────────────── */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(16,24,40,0.06), 0 1px 2px rgba(16,24,40,0.04);
+    }
+    a.card-link { text-decoration: none; transition: border-color 200ms ease; }
+    a.card-link:hover { border-color: var(--border-default); }
+
+    /* ── Badges ──────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+    }
+    .badge-open   { background: var(--accent); color: #fff; }
+    .badge-closed { background: var(--bg-subtle); color: var(--text-tertiary); }
+    .badge-draft  { background: rgba(249,183,14,0.15); color: #92400E; }
+
+    /* ── Section labels — numbered brand motif ────────── */
+    .section-label { display: flex; align-items: baseline; gap: 8px; margin-bottom: 20px; }
+    .section-label .sn { font-size: 12px; font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; font-family: 'Inter', sans-serif; }
+    .section-label .sd { font-size: 12px; color: var(--text-tertiary); }
+    .section-label h2  { font-family: 'Expletus Sans', Georgia, serif; font-size: 1.25rem; font-weight: 500; color: var(--text-primary); margin: 0; }
+
+    /* ── Navigation ──────────────────────────────────── */
+    .nav-link { color: var(--text-tertiary); font-size: 14px; text-decoration: none; transition: color 120ms ease; }
+    .nav-link:hover { color: var(--text-primary); }
+
+    .back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: var(--text-tertiary); text-decoration: none; transition: color 120ms ease; }
+    .back-link:hover { color: var(--text-primary); }
+
+    /* ── Flash messages ──────────────────────────────── */
+    .msg { padding: 12px 16px; border-radius: 8px; font-size: 14px; border-left: 4px solid; margin-bottom: 8px; line-height: 1.5; }
+    .msg-error   { background: rgba(217,45,32,0.08); border-left-color: #D92D20; color: #B42318; }
+    .msg-success { background: rgba(3,152,85,0.08);  border-left-color: #039855; color: #027A48; }
+    .msg-info    { background: var(--accent-subtle); border-left-color: var(--accent); color: var(--warm-black); }
+
+    /* ── Vote button ─────────────────────────────────── */
+    .vote-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      border: 1px solid transparent;
+      line-height: 1;
+      white-space: nowrap;
+      transition: all 120ms ease;
+    }
+    .vote-btn-unvoted { background: transparent; color: var(--text-secondary); border-color: var(--border-default); }
+    .vote-btn-unvoted:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); }
+    .vote-btn-voted { background: var(--accent); color: #fff; }
+    .vote-btn-voted:hover { background: var(--accent-hover); }
+
+    /* ── Form inputs ─────────────────────────────────── */
+    input[type=text], input[type=email], input[type=number], textarea, select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      background: var(--bg-surface);
+      outline: none;
+      line-height: 1.5;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+    input[type=text]:hover, textarea:hover, select:hover { border-color: var(--border-strong); }
+    input[type=text]:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(254,80,1,0.12);
+    }
+    textarea { min-height: 100px; resize: vertical; }
+
+    .field-label { display: block; font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 6px; font-family: 'Inter', sans-serif; }
+    .field-error { font-size: 12px; color: var(--error); margin-top: 4px; }
+    .field-hint  { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; line-height: 1.5; }
+
+    input[type=file]::file-selector-button {
+      padding: 6px 14px;
+      background: var(--bg-subtle);
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      cursor: pointer;
+      margin-right: 12px;
+      transition: background 120ms ease;
+    }
+    input[type=file]::file-selector-button:hover { background: var(--border-subtle); }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen" style="display:flex; flex-direction:column;">
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header style="background:rgba(255,255,255,0.92); border-bottom:1px solid var(--border-subtle); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);" class="sticky top-0 z-10">
+    <div class="max-w-5xl mx-auto px-6 flex items-center justify-between" style="height:56px;">
+
+      <!-- Logo lockup -->
+      <a href="/" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="28" height="28" rx="6" fill="#FE5001"/>
+          <text x="14" y="20" text-anchor="middle" fill="white"
+                font-family="'Expletus Sans', Georgia, serif"
+                font-size="15" font-weight="700">S</text>
+        </svg>
+        <span style="font-family:'Expletus Sans',Georgia,serif; font-weight:500; font-size:16px; letter-spacing:-0.01em; color:var(--warm-black);">
+          Strativ <span style="color:var(--accent);">Poll</span>
+        </span>
+      </a>
+
+      <!-- Navigation -->
+      <nav style="display:flex; align-items:center; gap:20px;">
+        {% if user.is_authenticated %}
+          {% if user.is_staff %}
+            <a href="{% url 'manage_event_list' %}" class="nav-link">Manage</a>
+          {% endif %}
+          <a href="{% url 'account_logout' %}" class="nav-link">Sign out</a>
+        {% else %}
+          <a href="{% url 'google_login' %}" class="btn btn-primary">Sign in</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Flash messages ─────────────────────────────── -->
+  {% if messages %}
+    <div class="max-w-5xl mx-auto px-6 pt-4">
+      {% for message in messages %}
+        <div class="msg {% if 'error' in message.tags %}msg-error{% elif 'success' in message.tags %}msg-success{% else %}msg-info{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- ── Lightbox ─────────────────────────────────── -->
+  <div id="lightbox" onclick="closeLightbox()" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.88); align-items:center; justify-content:center; cursor:zoom-out;">
+    <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" style="max-width:90vw; max-height:90vh; object-fit:contain; border-radius:6px; box-shadow:0 32px 64px rgba(0,0,0,0.6); cursor:default;">
+    <button onclick="closeLightbox()" aria-label="Close" style="position:fixed; top:16px; right:20px; background:rgba(255,255,255,0.12); border:none; color:#fff; width:36px; height:36px; border-radius:50%; font-size:20px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
+  </div>
+  <script>
+    function openLightbox(src, alt) {
+      const lb = document.getElementById('lightbox');
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox-img').alt = alt || '';
+      lb.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+  </script>
+
+  <!-- ── Main content ───────────────────────────────── -->
+  <main class="max-w-5xl mx-auto px-6 py-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Footer ────────────────────────────────────── -->
+  <footer style="border-top:1px solid var(--border-subtle); margin-top:auto;">
+    <div class="max-w-5xl mx-auto px-6 py-4" style="display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-size:12px; color:var(--text-disabled); font-family:'Inter',sans-serif;">Strativ Poll</span>
+      {% if user.is_authenticated %}
+        <span style="font-size:12px; color:var(--text-tertiary); font-family:'Inter',sans-serif;">{{ user.email }}</span>
+      {% endif %}
+    </div>
+  </footer>
+
+</body>
+</html>

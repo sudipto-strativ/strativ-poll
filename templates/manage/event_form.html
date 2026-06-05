@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Event{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:28px;">
+  {% if event %}
+    <a href="{% url 'manage_event_detail' event.id %}" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+  {% else %}
+    <a href="{% url 'manage_event_list' %}" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      Events
+    </a>
+  {% endif %}
+  <h1 style="font-size:2rem; font-weight:500; color:var(--warm-black); margin:12px 0 0; letter-spacing:-0.012em;">{{ action }} Event</h1>
+</div>
+
+<form method="post" style="max-width:480px;">
+  {% csrf_token %}
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    {% for field in form %}
+      <div>
+        <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="field-error">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  <div style="margin-top:24px; display:flex; gap:10px;">
+    <button type="submit" class="btn btn-primary">{{ action }}</button>
+    {% if event %}
+      <a href="{% url 'manage_event_detail' event.id %}" class="btn btn-secondary">Cancel</a>
+    {% else %}
+      <a href="{% url 'manage_event_list' %}" class="btn btn-secondary">Cancel</a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

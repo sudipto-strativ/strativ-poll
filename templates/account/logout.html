@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sign Out — Strativ Poll{% endblock %}
+
+{% block content %}
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:96px 0; text-align:center;">
+  <svg width="48" height="48" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:24px;" aria-hidden="true">
+    <rect width="28" height="28" rx="6" fill="#FE5001"/>
+    <text x="14" y="20" text-anchor="middle" fill="white"
+          font-family="'Expletus Sans', Georgia, serif"
+          font-size="15" font-weight="700">S</text>
+  </svg>
+  <h1 style="font-size:2rem; font-weight:500; color:var(--warm-black); margin:0 0 10px; letter-spacing:-0.012em;">Sign out?</h1>
+  <p style="font-size:15px; color:var(--text-tertiary); max-width:320px; margin:0 0 32px; line-height:1.6;">You'll need to sign in again to vote or manage events.</p>
+
+  <form method="post" action="{% url 'account_logout' %}" style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-destructive btn-lg">Sign out</button>
+    <a href="/" class="btn btn-secondary btn-lg">Cancel</a>
+  </form>
+</div>
+{% endblock %}

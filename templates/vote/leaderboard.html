@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load rank_extras thumbnail %}
+{% block title %}{{ event.title }} — Results{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:28px;">
+  <a href="/" class="back-link">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    All events
+  </a>
+  <h1 style="font-size:2rem; font-weight:500; color:var(--warm-black); margin:12px 0 8px; letter-spacing:-0.012em;">{{ event.title }}</h1>
+  {% if event.description %}
+    <p style="font-size:15px; color:var(--text-secondary); margin:0; line-height:1.6;">{{ event.description }}</p>
+  {% endif %}
+</div>
+
+{% if entries %}
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    {% for entry in entries|with_ranks %}
+      <a href="{% url 'entry_detail' event_id=event.id entry_id=entry.id %}" class="card-link" style="text-decoration:none; color:inherit;">
+      <div class="card" style="display:flex; overflow:hidden;
+        {% if entry.rank == 1 %}border-left:3px solid var(--accent);
+        {% elif entry.rank == 2 %}border-left:3px solid var(--border-strong);
+        {% elif entry.rank == 3 %}border-left:3px solid #C87941;{% endif %}">
+
+        {% with hero=entry.hero %}
+          {% if hero %}
+            <div style="width:80px; height:80px; flex-shrink:0; overflow:hidden; background:var(--bg-subtle); cursor:zoom-in;"
+                 data-lightbox="{% thumbnail hero.image 'detail' %}"
+                 data-alt="{{ entry.title }}"
+                 onclick="openLightbox(this.dataset.lightbox, this.dataset.alt)">
+              <img src="{% thumbnail hero.image 'card' %}" alt="{{ entry.title }}" style="width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;">
+            </div>
+          {% else %}
+            <div style="width:80px; height:80px; flex-shrink:0; background:var(--bg-subtle); display:flex; align-items:center; justify-content:center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-disabled);" aria-hidden="true">
+                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                <circle cx="12" cy="13" r="3"/>
+              </svg>
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div style="display:flex; align-items:center; gap:16px; flex:1; padding:12px 16px; min-width:0;">
+          <span style="font-size:1.4rem; font-weight:700; width:28px; text-align:center; flex-shrink:0; font-variant-numeric:tabular-nums; font-family:'Inter',sans-serif;
+            {% if entry.rank == 1 %}color:var(--accent);
+            {% elif entry.rank == 2 %}color:var(--border-strong);
+            {% elif entry.rank == 3 %}color:#C87941;
+            {% else %}color:var(--text-disabled);{% endif %}">
+            {{ entry.rank }}
+          </span>
+          <div style="flex:1; min-width:0;">
+            <p style="font-weight:500; font-size:15px; color:var(--text-primary); margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ entry.title }}</p>
+            {% if entry.submitter_name %}
+              <p style="font-size:13px; color:var(--text-tertiary); margin:2px 0 0;">{{ entry.submitter_name }}</p>
+            {% endif %}
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <span style="font-size:1.25rem; font-weight:700; color:var(--text-primary); font-variant-numeric:tabular-nums; font-family:'Inter',sans-serif; display:block;">{{ entry.vote_count }}</span>
+            <span style="font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.04em;">vote{{ entry.vote_count|pluralize }}</span>
+          </div>
+        </div>
+      </div>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p style="color:var(--text-tertiary); font-size:15px;">No entries yet.</p>
+{% endif %}
+{% endblock %}

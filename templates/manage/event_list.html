@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Manage Events{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:28px;">
+  <h1 style="font-size:2rem; font-weight:500; color:var(--warm-black); margin:0; letter-spacing:-0.012em;">Events</h1>
+  <a href="{% url 'manage_event_create' %}" class="btn btn-primary">+ New event</a>
+</div>
+
+{% if events %}
+  <div style="display:flex; flex-direction:column; gap:8px;">
+    {% for event in events %}
+      <a href="{% url 'manage_event_detail' event.id %}" class="card card-link" style="display:flex; align-items:center; gap:16px; padding:16px;">
+        <div style="flex:1; min-width:0;">
+          <h3 style="font-size:15px; font-weight:500; color:var(--text-primary); margin:0; font-family:'Inter',sans-serif; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ event.title }}</h3>
+          <p style="font-size:12px; color:var(--text-tertiary); margin:3px 0 0; font-variant-numeric:tabular-nums;">{{ event.created_at|date:"N j, Y" }}</p>
+        </div>
+        <span class="badge {% if event.status == 'open' %}badge-open{% elif event.status == 'draft' %}badge-draft{% else %}badge-closed{% endif %}">
+          {{ event.status }}
+        </span>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p style="color:var(--text-tertiary); font-size:15px;">
+    No events yet.
+    <a href="{% url 'manage_event_create' %}" style="color:var(--accent); text-decoration:underline;">Create one.</a>
+  </p>
+{% endif %}
+{% endblock %}

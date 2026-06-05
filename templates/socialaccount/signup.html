@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Complete sign in — Strativ Poll{% endblock %}
+
+{% block content %}
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:96px 0; text-align:center;">
+  <h1 style="font-size:2rem; font-weight:500; color:var(--warm-black); margin:0 0 10px; letter-spacing:-0.012em;">Almost there</h1>
+  <p style="font-size:15px; color:var(--text-tertiary); max-width:360px; margin:0 0 32px; line-height:1.6;">
+    Confirm your Strativ account to continue.
+  </p>
+
+  <form method="post" action="" id="signup-form" style="width:100%; max-width:360px; text-align:left;">
+    {% csrf_token %}
+    {% for field in form %}
+      <div style="margin-bottom:16px;">
+        <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="field-error">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+      Complete sign in
+    </button>
+  </form>
+</div>
+
+<script>
+  // Auto-submit if the form has no validation errors and all fields are pre-filled by Google
+  (function () {
+    var form = document.getElementById('signup-form');
+    var inputs = form.querySelectorAll('input:not([type=hidden])');
+    var allFilled = Array.from(inputs).every(function (el) { return el.value.trim() !== ''; });
+    if (allFilled) form.submit();
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+{% block title %}{{ entry.title }} — {{ event.title }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:28px;">
+  <a href="{% url 'event_detail' event_id=event.id %}" class="back-link">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    {{ event.title }}
+  </a>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr; gap:24px; max-width:800px;">
+
+  <!-- Entry info card -->
+  <div class="card" style="overflow:hidden;">
+    {% with hero=entry.hero %}
+      {% if hero %}
+        <div style="aspect-ratio:16/9; overflow:hidden; background:var(--bg-subtle); cursor:zoom-in;"
+             data-lightbox="{% thumbnail hero.image 'detail' %}"
+             data-alt="{{ entry.title }}"
+             onclick="openLightbox(this.dataset.lightbox, this.dataset.alt)">
+          <img src="{% thumbnail hero.image 'detail' %}" alt="{{ entry.title }}"
+               style="width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;">
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div style="padding:20px 24px;">
+      <h1 style="font-size:1.5rem; font-weight:500; color:var(--warm-black); margin:0 0 6px; letter-spacing:-0.012em;">{{ entry.title }}</h1>
+      {% if entry.submitter_name %}
+        <p style="font-size:13px; color:var(--text-tertiary); margin:0 0 12px;">Submitted by {{ entry.submitter_name }}</p>
+      {% endif %}
+      {% if entry.description %}
+        <p style="font-size:14px; color:var(--text-secondary); margin:0; line-height:1.6;">{{ entry.description }}</p>
+      {% endif %}
+
+      {% if entry.images.count > 1 %}
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;">
+          {% for img in entry.images.all %}
+            {% if not img.is_hero %}
+              <div style="width:72px; height:72px; overflow:hidden; border-radius:8px; background:var(--bg-subtle); cursor:zoom-in; flex-shrink:0;"
+                   data-lightbox="{% thumbnail img.image 'detail' %}"
+                   data-alt="{{ entry.title }}"
+                   onclick="openLightbox(this.dataset.lightbox, this.dataset.alt)">
+                <img src="{% thumbnail img.image 'card' %}" alt=""
+                     style="width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;">
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Voters card -->
+  <div class="card" style="padding:20px 24px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+      <h2 style="font-size:1rem; font-weight:500; color:var(--text-primary); margin:0;">Voters</h2>
+      <span style="font-size:13px; font-weight:600; color:var(--accent); font-variant-numeric:tabular-nums;">{{ voters.count }} vote{{ voters.count|pluralize }}</span>
+    </div>
+
+    {% if voters %}
+      <div style="display:flex; flex-direction:column; gap:0;">
+        {% for vote in voters %}
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0;
+               {% if not forloop.last %}border-bottom:1px solid var(--border-subtle);{% endif %}">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:32px; height:32px; border-radius:50%; background:var(--accent-subtle); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <span style="font-size:12px; font-weight:600; color:var(--accent); text-transform:uppercase;">{{ vote.user.email|slice:":1" }}</span>
+              </div>
+              <span style="font-size:14px; color:var(--text-primary);">{{ vote.user.email }}</span>
+            </div>
+            <span style="font-size:12px; color:var(--text-tertiary);">{{ vote.created_at|date:"M j, H:i" }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="font-size:14px; color:var(--text-tertiary); margin:0;">No votes yet.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
