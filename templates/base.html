@@ -237,23 +237,51 @@
   {% endif %}
 
   <!-- ── Lightbox ─────────────────────────────────── -->
-  <div id="lightbox" onclick="closeLightbox()" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.88); align-items:center; justify-content:center; cursor:zoom-out;">
-    <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" style="max-width:90vw; max-height:90vh; object-fit:contain; border-radius:6px; box-shadow:0 32px 64px rgba(0,0,0,0.6); cursor:default;">
-    <button onclick="closeLightbox()" aria-label="Close" style="position:fixed; top:16px; right:20px; background:rgba(255,255,255,0.12); border:none; color:#fff; width:36px; height:36px; border-radius:50%; font-size:20px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
+  <div id="lightbox" onclick="closeLightbox()" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.88); align-items:center; justify-content:center;">
+    <button id="lb-prev" onclick="event.stopPropagation(); lbNav(-1)" aria-label="Previous" style="position:fixed; left:16px; background:rgba(255,255,255,0.12); border:none; color:#fff; width:44px; height:44px; border-radius:50%; font-size:22px; cursor:pointer; display:none; align-items:center; justify-content:center;">&#8249;</button>
+    <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" style="max-width:90vw; max-height:90vh; object-fit:contain; border-radius:6px; box-shadow:0 32px 64px rgba(0,0,0,0.6);">
+    <button id="lb-next" onclick="event.stopPropagation(); lbNav(1)" aria-label="Next" style="position:fixed; right:16px; background:rgba(255,255,255,0.12); border:none; color:#fff; width:44px; height:44px; border-radius:50%; font-size:22px; cursor:pointer; display:none; align-items:center; justify-content:center;">&#8250;</button>
+    <button onclick="closeLightbox()" aria-label="Close" style="position:fixed; top:16px; right:20px; background:rgba(255,255,255,0.12); border:none; color:#fff; width:36px; height:36px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
+    <span id="lb-counter" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,0.7); font-size:13px; font-family:'Inter',sans-serif; display:none;"></span>
   </div>
   <script>
+    let _lbImgs = [], _lbIdx = 0;
+
     function openLightbox(src, alt) {
-      const lb = document.getElementById('lightbox');
-      document.getElementById('lightbox-img').src = src;
-      document.getElementById('lightbox-img').alt = alt || '';
-      lb.style.display = 'flex';
+      openLightboxGallery([src], 0, alt);
+    }
+    function openLightboxGallery(imgs, idx, alt) {
+      _lbImgs = imgs; _lbIdx = idx;
+      document.getElementById('lightbox').style.display = 'flex';
       document.body.style.overflow = 'hidden';
+      _lbRender(alt);
+    }
+    function _lbRender(alt) {
+      const img = document.getElementById('lightbox-img');
+      img.src = _lbImgs[_lbIdx];
+      img.alt = alt || '';
+      const multi = _lbImgs.length > 1;
+      const prev = document.getElementById('lb-prev');
+      const next = document.getElementById('lb-next');
+      const counter = document.getElementById('lb-counter');
+      prev.style.display = multi && _lbIdx > 0 ? 'flex' : 'none';
+      next.style.display = multi && _lbIdx < _lbImgs.length - 1 ? 'flex' : 'none';
+      counter.style.display = multi ? 'block' : 'none';
+      counter.textContent = `${_lbIdx + 1} / ${_lbImgs.length}`;
+    }
+    function lbNav(dir) {
+      _lbIdx = Math.max(0, Math.min(_lbImgs.length - 1, _lbIdx + dir));
+      _lbRender();
     }
     function closeLightbox() {
       document.getElementById('lightbox').style.display = 'none';
       document.body.style.overflow = '';
     }
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') lbNav(-1);
+      if (e.key === 'ArrowRight') lbNav(1);
+    });
   </script>
 
   <!-- ── Main content ───────────────────────────────── -->

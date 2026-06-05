@@ -26,9 +26,7 @@
         {% with hero=entry.hero %}
           {% if hero %}
             <div style="width:80px; height:80px; flex-shrink:0; overflow:hidden; background:var(--bg-subtle); cursor:zoom-in;"
-                 data-lightbox="{% thumbnail hero.image 'detail' %}"
-                 data-alt="{{ entry.title }}"
-                 onclick="openLightbox(this.dataset.lightbox, this.dataset.alt)">
+                 onclick="event.stopPropagation(); openLightboxGallery([{% for img in entry.images.all %}'{% thumbnail img.image 'detail' %}'{% if not forloop.last %},{% endif %}{% endfor %}], 0, '{{ entry.title|escapejs }}')">
               <img src="{% thumbnail hero.image 'card' %}" alt="{{ entry.title }}" style="width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;">
             </div>
           {% else %}
